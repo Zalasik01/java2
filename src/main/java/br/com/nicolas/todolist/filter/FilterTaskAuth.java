@@ -3,6 +3,7 @@ package br.com.nicolas.todolist.filter;
 import java.io.IOException;
 import java.util.Base64;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,7 +23,10 @@ public class FilterTaskAuth extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-               
+
+                var servletPath = request.getServletPath();
+
+                if(servletPath.equals("/tasks/")) {
                 // Pegar a autenticação (usuario + senha)
                 var authorization = request.getHeader("Authorization");
 
@@ -41,15 +45,23 @@ public class FilterTaskAuth extends OncePerRequestFilter {
                 String password = credentials[1];
 
                 // Validar usuário
-                    var user = this.userRepository.findByUsername(username);
-                    if (user == null) {
-                        response.sendError(401, "Usuário sem autorização");                        
-                    }else {                        
-                        // Validar senha
-                        
-
-                        // Segue caminho
+                var user = this.userRepository.findByUsername(username);
+                if (user == null) {
+                    response.sendError(401, "Usuário sem autorização");
+                }else {
+                    // Validar senha
+                    var passwordVerify = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
+                    if (passwordVerify.verified) {
                         filterChain.doFilter(request, response);
+                    } else {
+                        response.sendError(401);
                     }
+
+                    // Segue caminho
+                    filterChain.doFilter(request, response);
+                }
+            } else {
+                filterChain.doFilter(request, response);
             }
+    }
 }
