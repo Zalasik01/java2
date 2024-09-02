@@ -58,7 +58,7 @@ public class FilterTaskAuth extends OncePerRequestFilter {
                 request.setAttribute("idUser", user.getId());
                 filterChain.doFilter(request, response);
             } else {
-                response.sendError(401, "Senha inválida");
+                response.sendError(401, "Senha inválida para o usuário" + username);
             }
         } else {
             filterChain.doFilter(request, response);
