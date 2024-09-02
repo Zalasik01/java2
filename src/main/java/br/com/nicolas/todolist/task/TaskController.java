@@ -83,7 +83,7 @@ public class TaskController {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Erro: Usuário" + user + "não encontrado");
+                    .body("Erro: Usuário" + user.getUsername() + "não encontrado");
         }
 
         if(!task.getIdUser().equals(idUser)) {
@@ -92,7 +92,6 @@ public class TaskController {
         }
 
         Utils.copyNonNullProperties(taskModel, task);
-        task.setUsername(user.getUsername());
         var taskUpdated = this.taskRepository.save(task);
         return ResponseEntity.ok().body(taskUpdated);
     }
