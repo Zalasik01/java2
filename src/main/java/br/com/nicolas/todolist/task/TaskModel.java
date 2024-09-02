@@ -39,6 +39,9 @@ public class TaskModel {
     @Column(name = "id_usuario")
     private UUID idUser;
 
+    @Column(name = "usuario")
+    private String username;
+
     @CreationTimestamp
     @Column(name = "criacao")
     private LocalDateTime creatAt;    

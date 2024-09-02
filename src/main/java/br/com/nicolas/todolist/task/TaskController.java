@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import br.com.nicolas.todolist.user.iUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,9 @@ public class TaskController {
     
     @Autowired
     private iTaskRepository taskRepository;
+
+    @Autowired
+    private iUserRepository userRepository;
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
@@ -65,13 +69,20 @@ public class TaskController {
         }
 
         var idUser = request.getAttribute("idUser");
+        var user = userRepository.findById((UUID) idUser).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erro: Usuário" + user + "não encontrado");
+        }
 
         if(!task.getIdUser().equals(idUser)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erro: Usuário" + idUser + "não tem permissão para alterar essa tarefa");
+                .body("Erro: Usuário " + user.getUsername() + " não tem permissão para alterar essa tarefa");
         }
 
         Utils.copyNonNullProperties(taskModel, task);
+        task.setUsername(user.getUsername());
         var taskUpdated = this.taskRepository.save(task);
         return ResponseEntity.ok().body(taskUpdated);
     }
