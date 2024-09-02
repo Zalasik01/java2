@@ -47,7 +47,7 @@ public class FilterTaskAuth extends OncePerRequestFilter {
             // Validar usuário
             var user = this.userRepository.findByUsername(username);
             if (user == null) {
-                response.sendError(401, "Usuário sem autorização");
+                response.sendError(401, "Erro: Usuário " + username + " não tem autorização para acessar este recurso.");
                 return;
             }
 

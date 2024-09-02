@@ -2,11 +2,13 @@ package br.com.nicolas.todolist.task;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,15 +61,14 @@ public class TaskController {
         var task = this.taskRepository.findById(id).orElse(null);
 
         if(task == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erro: Tarefa não encontrada");
+            throw new NoSuchElementException("Erro: Tarefa com ID '" + id + "' não encontrada.");
         }
 
         var idUser = request.getAttribute("idUser");
 
         if(!task.getIdUser().equals(idUser)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Erro: Usuário não tem permissão para alterar essa tarefa");
+                .body("Erro: Usuário" + idUser + "não tem permissão para alterar essa tarefa");
         }
 
         Utils.copyNonNullProperties(taskModel, task);
