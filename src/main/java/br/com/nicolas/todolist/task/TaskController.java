@@ -54,10 +54,19 @@ public class TaskController {
     }
 
     @GetMapping("/")
-    public List<TaskModel> list(HttpServletRequest request) {
+    public ResponseEntity<?> list(HttpServletRequest request) {
         var idUser = request.getAttribute("idUser");
         var tasks = this.taskRepository.findByIdUser((UUID) idUser);
-        return tasks;
+
+        if (tasks == null || tasks.isEmpty()) {
+            var user = userRepository.findById((UUID) idUser).orElse(null);
+            String username = user != null ? user.getUsername() : "Desconhecido";
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Erro: Nenhuma tarefa encontrada para o usuário '" + username + "'");
+        }
+
+        return ResponseEntity.ok(tasks);
     }
 
     @PutMapping("/{id}")
