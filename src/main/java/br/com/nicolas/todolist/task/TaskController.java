@@ -65,7 +65,8 @@ public class TaskController {
         var task = this.taskRepository.findById(id).orElse(null);
 
         if(task == null) {
-            throw new NoSuchElementException("Erro: Tarefa com ID '" + id + "' não encontrada.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erro: Tarefa '" + task + "' não encontrada");
         }
 
         var idUser = request.getAttribute("idUser");

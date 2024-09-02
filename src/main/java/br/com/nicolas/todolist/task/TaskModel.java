@@ -48,7 +48,7 @@ public class TaskModel {
 
     public void setTitle(String title) throws Exception{
         if(title.length() > 50) {
-            throw new Exception("Erro: O título excede o limite permitido de 50 caracteres. Tamanho atual: " + title.length() + " caracteres.");            
+            throw new Exception("Erro: O título excede o limite permitido de 50 caracteres. Tamanho atual: '" + title.length() + "' caracteres.");
         }
         this.title = title;
     }
